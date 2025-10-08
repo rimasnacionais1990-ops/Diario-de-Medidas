@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diário de Medidas</title>
+    <style>
+        :root {
+            --primary: #4a6fa5;
+            --secondary: #6b8cbc;
+            --accent: #ff7e5f;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1.5rem 0;
+            text-align: center;
+            border-radius: 0 0 15px 15px;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+        
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card-title {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .card-title i {
+            font-size: 1.2rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border 0.3s;
+        }
+        
+        input:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(74, 111, 165, 0.2);
+        }
+        
+        .measurement-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        
+        .activities-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+        
+        .activities-section {
+            background: #f8f9fa;
+            padding: 1.2rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent);
+        }
+        
+        .activities-title {
+            color: var(--accent);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.8rem;
+        }
+        
+        .checkbox-group input {
+            width: auto;
+            margin-right: 10px;
+        }
+        
+        .checkbox-group label {
+            margin-bottom: 0;
+            font-weight: normal;
+        }
+        
+        .activity-details {
+            margin-left: 25px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+        
+        .activity-details.show {
+            display: block;
+        }
+        
+        .activity-input {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 5px;
+        }
+        
+        .activity-input input {
+            flex: 1;
+        }
+        
+        .activity-unit {
+            color: #6c757d;
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+        
+        .custom-activities {
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid #ddd;
+        }
+        
+        .custom-activity-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 0.8rem;
+            padding: 0.5rem;
+            background: white;
+            border-radius: 5px;
+            border: 1px solid #eee;
+        }
+        
+        .custom-activity-input {
+            flex: 1;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .custom-activity-input input {
+            flex: 1;
+        }
+        
+        .remove-activity {
+            background: var(--danger);
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .add-activity-btn {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 0.5rem;
+        }
+        
+        .btn {
+            display: inline-block;
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: background 0.3s, transform 0.2s;
+            text-align: center;
+        }
+        
+        .btn:hover {
+            background: #ff6b4a;
+            transform: translateY(-2px);
+        }
+        
+        .btn-block {
+            display: block;
+            width: 100%;
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        
+        .btn-clear {
+            background: #6c757d;
+            margin-top: 1rem;
+        }
+        
+        .btn-clear:hover {
+            background: #5a6268;
+        }
+        
+        .history-section {
+            margin-top: 2rem;
+        }
+        
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .history-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .history-item {
+            background: white;
+            border-radius: 8px;
+            padding: 1.2rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border-left: 4px solid var(--primary);
+            position: relative;
+        }
+        
+        .delete-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            color: #dc3545;
+            cursor: pointer;
+            font-size: 1.2rem;
+            opacity: 0.7;
+            transition: opacity 0.3s;
+        }
+        
+        .delete-btn:hover {
+            opacity: 1;
+        }
+        
+        .history-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.8rem;
+        }
+        
+        .history-date {
+            font-weight: bold;
+            color: var(--primary);
+            font-size: 1.1rem;
+        }
+        
+        .history-weight {
+            background: var(--primary);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+        
+        .history-measurements {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 0.8rem;
+            margin-bottom: 1rem;
+        }
+        
+        .measure-group {
+            margin-bottom: 0.5rem;
+        }
+        
+        .measure-label {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+        
+        .measure-value {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        
+        .history-activities {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.8rem;
+            padding-top: 0.8rem;
+            border-top: 1px solid #f0f0f0;
+        }
+        
+        .activity-tag {
+            background: var(--warning);
+            color: var(--dark);
+            padding: 0.3rem 0.6rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .activity-detail {
+            font-size: 0.75rem;
+            margin-top: 2px;
+            color: #495057;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: #6c757d;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding: 1rem;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .measurement-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .activities-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .history-measurements {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .history-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .history-actions {
+                width: 100%;
+            }
+            
+            .history-actions .btn {
+                flex: 1;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .history-measurements {
+                grid-template-columns: 1fr;
+            }
+            
+            .history-item-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Meu Diário de Medidas</h1>
+            <p class="subtitle">Acompanhe sua evolução corporal e atividades físicas</p>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="card">
+            <h2 class="card-title">
+                <i>📝</i> Registrar Novas Medidas
+            </h2>
+            
+            <form id="measurement-form">
+                <div class="form-group">
+                    <label for="date">Data da Medição</label>
+                    <input type="date" id="date" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="weight">Peso Atual (kg)</label>
+                    <input type="number" id="weight" step="0.1" placeholder="Ex: 70.5" required>
+                </div>
+                
+                <h3 class="card-title" style="margin-top: 1.5rem;">
+                    <i>👤</i> Tronco
+                </h3>
+                <div class="measurement-grid">
+                    <div class="form-group">
+                        <label for="neck">Pescoço (cm)</label>
+                        <input type="number" id="neck" step="0.1" placeholder="Ex: 38.5">
+                    </div>
+                    <div class="form-group">
+                        <label for="shoulder">Ombro (cm)</label>
+                        <input type="number" id="shoulder" step="0.1" placeholder="Ex: 120.0">
+                    </div>
+                    <div class="form-group">
+                        <label for="waist">Cintura (cm)</label>
+                        <input type="number" id="waist" step="0.1" placeholder="Ex: 85.0">
+                    </div>
+                    <div class="form-group">
+                        <label for="hip">Quadril (cm)</label>
+                        <input type="number" id="hip" step="0.1" placeholder="Ex: 95.0">
+                    </div>
+                </div>
+                
+                <div class="activities-grid">
+                    <div>
+                        <h3 class="card-title" style="margin-top: 1.5rem;">
+                            <i>💪</i> Membros Superiores
+                        </h3>
+                        <div class="measurement-grid">
+                            <div class="form-group">
+                                <label for="right-arm">Braço Direito Relaxado (cm)</label>
+                                <input type="number" id="right-arm" step="0.1" placeholder="Ex: 32.5">
+                            </div>
+                            <div class="form-group">
+                                <label for="left-arm">Braço Esquerdo Relaxado (cm)</label>
+                                <input type="number" id="left-arm" step="0.1" placeholder="Ex: 32.0">
+                            </div>
+                        </div>
+                        
+                        <h3 class="card-title" style="margin-top: 1.5rem;">
+                            <i>🦵</i> Membros Inferiores
+                        </h3>
+                        <div class="measurement-grid">
+                            <div class="form-group">
+                                <label for="right-thigh">Coxa Direita (cm)</label>
+                                <input type="number" id="right-thigh" step="0.1" placeholder="Ex: 55.0">
+                            </div>
+                            <div class="form-group">
+                                <label for="left-thigh">Coxa Esquerda (cm)</label>
+                                <input type="number" id="left-thigh" step="0.1" placeholder="Ex: 54.5">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="activities-section">
+                        <h3 class="activities-title">
+                            <i>🏃‍♂️</i> Atividades Físicas
+                        </h3>
+                        <p style="margin-bottom: 1rem; color: #6c757d; font-size: 0.9rem;">
+                            Marque as atividades realizadas no dia:
+                        </p>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="running" name="activities" value="running">
+                            <label for="running">Corrida</label>
+                        </div>
+                        <div class="activity-details" id="running-details">
+                            <div class="activity-input">
+                                <input type="number" id="running-distance" step="0.1" placeholder="Distância">
+                                <span class="activity-unit">km</span>
+                            </div>
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="gym" name="activities" value="gym">
+                            <label for="gym">Academia</label>
+                        </div>
+                        <div class="activity-details" id="gym-details">
+                            <div class="activity-input">
+                                <input type="text" id="gym-workout" placeholder="Treino realizado">
+                            </div>
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="bar" name="activities" value="bar">
+                            <label for="bar">Barra</label>
+                        </div>
+                        <div class="activity-details" id="bar-details">
+                            <div class="activity-input">
+                                <input type="number" id="bar-reps" placeholder="Repetições">
+                                <span class="activity-unit">reps</span>
+                            </div>
+                        </div>
+                        
+                        <div class="custom-activities">
+                            <div class="activities-title">
+                                <i>➕</i> Atividades Personalizadas
+                            </div>
+                            <div id="custom-activities-list">
+                                <!-- Atividades personalizadas serão adicionadas aqui -->
+                            </div>
+                            <button type="button" class="add-activity-btn" id="add-activity">
+                                <i>➕</i> Adicionar Atividade
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-block" style="margin-top: 1.5rem;">Salvar Medidas e Atividades</button>
+            </form>
+        </div>
+        
+        <div class="history-section">
+            <div class="history-header">
+                <h2 class="card-title">
+                    <i>📊</i> Histórico de Medidas
+                </h2>
+                <div class="history-actions">
+                    <button class="btn btn-clear" id="clear-history">Limpar Histórico</button>
+                </div>
+            </div>
+            
+            <div id="history-container">
+                <div class="empty-state" id="empty-history">
+                    <p>Nenhuma medida registrada ainda.</p>
+                    <p>Adicione sua primeira medida acima!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="container">
+            <p>Henrique Valverde &copy; 2023 - Acompanhe sua evolução corporal</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('measurement-form');
+            const historyContainer = document.getElementById('history-container');
+            const emptyHistory = document.getElementById('empty-history');
+            const clearHistoryBtn = document.getElementById('clear-history');
+            const addActivityBtn = document.getElementById('add-activity');
+            const customActivitiesList = document.getElementById('custom-activities-list');
+            
+            // Definir data atual como padrão
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('date').value = today;
+            
+            // Carregar histórico do localStorage
+            loadHistory();
+            
+            // Mostrar/ocultar detalhes das atividades
+            document.querySelectorAll('input[name="activities"]').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const detailsId = this.id + '-details';
+                    const detailsElement = document.getElementById(detailsId);
+                    
+                    if (this.checked) {
+                        detailsElement.classList.add('show');
+                    } else {
+                        detailsElement.classList.remove('show');
+                    }
+                });
+            });
+            
+            // Adicionar atividade personalizada
+            addActivityBtn.addEventListener('click', function() {
+                const activityId = 'custom-' + Date.now();
+                const activityItem = document.createElement('div');
+                activityItem.className = 'custom-activity-item';
+                activityItem.innerHTML = `
+                    <div class="custom-activity-input">
+                        <input type="text" placeholder="Nome da atividade" class="custom-activity-name">
+                        <input type="text" placeholder="Detalhes (opcional)" class="custom-activity-detail">
+                    </div>
+                    <button type="button" class="remove-activity">×</button>
+                `;
+                
+                customActivitiesList.appendChild(activityItem);
+                
+                // Adicionar evento para remover atividade
+                activityItem.querySelector('.remove-activity').addEventListener('click', function() {
+                    activityItem.remove();
+                });
+            });
+            
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Coletar atividades selecionadas e seus detalhes
+                const activities = [];
+                document.querySelectorAll('input[name="activities"]:checked').forEach(checkbox => {
+                    let activityDetail = '';
+                    
+                    switch(checkbox.value) {
+                        case 'running':
+                            activityDetail = document.getElementById('running-distance').value;
+                            if (activityDetail) {
+                                activities.push({
+                                    type: 'running',
+                                    name: 'Corrida',
+                                    detail: activityDetail + ' km'
+                                });
+                            } else {
+                                activities.push({
+                                    type: 'running',
+                                    name: 'Corrida'
+                                });
+                            }
+                            break;
+                        case 'gym':
+                            activityDetail = document.getElementById('gym-workout').value;
+                            if (activityDetail) {
+                                activities.push({
+                                    type: 'gym',
+                                    name: 'Academia',
+                                    detail: activityDetail
+                                });
+                            } else {
+                                activities.push({
+                                    type: 'gym',
+                                    name: 'Academia'
+                                });
+                            }
+                            break;
+                        case 'bar':
+                            activityDetail = document.getElementById('bar-reps').value;
+                            if (activityDetail) {
+                                activities.push({
+                                    type: 'bar',
+                                    name: 'Barra',
+                                    detail: activityDetail + ' repetições'
+                                });
+                            } else {
+                                activities.push({
+                                    type: 'bar',
+                                    name: 'Barra'
+                                });
+                            }
+                            break;
+                    }
+                });
+                
+                // Coletar atividades personalizadas
+                document.querySelectorAll('.custom-activity-item').forEach(item => {
+                    const name = item.querySelector('.custom-activity-name').value;
+                    const detail = item.querySelector('.custom-activity-detail').value;
+                    
+                    if (name) {
+                        if (detail) {
+                            activities.push({
+                                type: 'custom',
+                                name: name,
+                                detail: detail
+                            });
+                        } else {
+                            activities.push({
+                                type: 'custom',
+                                name: name
+                            });
+                        }
+                    }
+                });
+                
+                // Coletar dados do formulário
+                const measurement = {
+                    date: document.getElementById('date').value,
+                    weight: document.getElementById('weight').value,
+                    neck: document.getElementById('neck').value,
+                    shoulder: document.getElementById('shoulder').value,
+                    waist: document.getElementById('waist').value,
+                    hip: document.getElementById('hip').value,
+                    rightArm: document.getElementById('right-arm').value,
+                    leftArm: document.getElementById('left-arm').value,
+                    rightThigh: document.getElementById('right-thigh').value,
+                    leftThigh: document.getElementById('left-thigh').value,
+                    activities: activities
+                };
+                
+                // Salvar no localStorage
+                saveMeasurement(measurement);
+                
+                // Recarregar histórico
+                loadHistory();
+                
+                // Limpar formulário
+                form.reset();
+                document.getElementById('date').value = today;
+                
+                // Ocultar detalhes das atividades
+                document.querySelectorAll('.activity-details').forEach(detail => {
+                    detail.classList.remove('show');
+                });
+                
+                // Limpar atividades personalizadas
+                customActivitiesList.innerHTML = '';
+                
+                // Mostrar mensagem de sucesso
+                alert('Medidas e atividades salvas com sucesso!');
+            });
+            
+            clearHistoryBtn.addEventListener('click', function() {
+                if (confirm('Tem certeza que deseja limpar todo o histórico? Esta ação não pode ser desfeita.')) {
+                    localStorage.removeItem('bodyMeasurements');
+                    loadHistory();
+                }
+            });
+            
+            function saveMeasurement(measurement) {
+                let history = JSON.parse(localStorage.getItem('bodyMeasurements') || '[]');
+                history.push(measurement);
+                
+                // Ordenar por data (mais recente primeiro)
+                history.sort((a, b) => new Date(b.date) - new Date(a.date));
+                
+                localStorage.setItem('bodyMeasurements', JSON.stringify(history));
+            }
+            
+            function loadHistory() {
+                const history = JSON.parse(localStorage.getItem('bodyMeasurements') || '[]');
+                
+                if (history.length === 0) {
+                    emptyHistory.style.display = 'block';
+                    return;
+                }
+                
+                emptyHistory.style.display = 'none';
+                historyContainer.innerHTML = '';
+                
+                history.forEach((item, index) => {
+                    const historyItem = document.createElement('div');
+                    historyItem.className = 'history-item';
+                    
+                    // CORREÇÃO DA DATA: Usar a data do registro, não a data atual
+                    const date = new Date(item.date);
+                    const formattedDate = date.toLocaleDateString('pt-BR', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
+                    
+                    // Formatar a data com a primeira letra maiúscula
+                    const capitalizedDate = formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
+                    
+                    let content = `
+                        <button class="delete-btn" data-index="${index}">✕</button>
+                        <div class="history-item-header">
+                            <div class="history-date">${capitalizedDate}</div>
+                            <div class="history-weight">${item.weight} kg</div>
+                        </div>
+                        <div class="history-measurements">
+                    `;
+                    
+                    // Adicionar medidas apenas se existirem
+                    if (item.neck) {
+                        content += `
+                            <div class="measure-group">
+                                <div class="measure-label">Pescoço</div>
+                                <div class="measure-value">${item.neck} cm</div>
+                            </div>
+                        `;
+                    }
+                    
+                    if (item.shoulder) {
+                        content += `
+                            <div class="measure-group">
+                                <div class="measure-label">Ombro</div>
+                                <div class="measure-value">${item.shoulder} cm</div>
+                            </div>
+                        `;
+                    }
+                    
+                    if (item.waist) {
+                        content += `
+                            <div class="measure-group">
+                                <div class="measure-label">Cintura</div>
+                                <div class="measure-value">${item.waist} cm</div>
+                            </div>
+                        `;
+                    }
+                    
+                    if (item.hip) {
+                        content += `
+                            <div class="measure-group">
+                                <div class="measure-label">Quadril</div>
+                                <div class="measure-value">${item.hip} cm</div>
+                            </div>
+                        `;
+                    }
+                    
+                    if (item.rightArm) {
+                        content += `
+                            <div class="measure-group">
+                                <div class="measure-label">Braço Direito</div>
+                                <div class="measure-value">${item.rightArm} cm</div>
+                            </div>
+                        `;
+                    }
+                    
+                    if (item.leftArm) {
+                        content += `
+                            <div class="measure-group">
+                                <div class="measure-label">Braço Esquerdo</div>
+                                <div class="measure-value">${item.leftArm} cm</div>
+                            </div>
+                        `;
+                    }
+                    
+                    if (item.rightThigh) {
+                        content += `
+                            <div class="measure-group">
+                                <div class="measure-label">Coxa Direita</div>
+                                <div class="measure-value">${item.rightThigh} cm</div>
+                            </div>
+                        `;
+                    }
+                    
+                    if (item.leftThigh) {
+                        content += `
+                            <div class="measure-group">
+                                <div class="measure-label">Coxa Esquerda</div>
+                                <div class="measure-value">${item.leftThigh} cm</div>
+                            </div>
+                        `;
+                    }
+                    
+                    content += `</div>`;
+                    
+                    // Adicionar atividades se existirem
+                    if (item.activities && item.activities.length > 0) {
+                        content += `<div class="history-activities">`;
+                        
+                        item.activities.forEach(activity => {
+                            let activityName = activity.name;
+                            let emoji = '🏃‍♂️';
+                            
+                            switch(activity.type) {
+                                case 'running':
+                                    emoji = '🏃‍♂️';
+                                    break;
+                                case 'gym':
+                                    emoji = '🏋️‍♂️';
+                                    break;
+                                case 'bar':
+                                    emoji = '💪';
+                                    break;
+                                case 'custom':
+                                    emoji = '➕';
+                                    break;
+                            }
+                            
+                            if (activity.detail) {
+                                content += `
+                                    <div class="activity-tag">
+                                        ${emoji} ${activityName}
+                                        <div class="activity-detail">${activity.detail}</div>
+                                    </div>
+                                `;
+                            } else {
+                                content += `<div class="activity-tag">${emoji} ${activityName}</div>`;
+                            }
+                        });
+                        
+                        content += `</div>`;
+                    }
+                    
+                    historyItem.innerHTML = content;
+                    historyContainer.appendChild(historyItem);
+                });
+                
+                // Adicionar eventos de clique para os botões de exclusão
+                document.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const index = parseInt(this.getAttribute('data-index'));
+                        deleteMeasurement(index);
+                    });
+                });
+            }
+            
+            function deleteMeasurement(index) {
+                if (confirm('Tem certeza que deseja excluir este registro?')) {
+                    let history = JSON.parse(localStorage.getItem('bodyMeasurements') || '[]');
+                    history.splice(index, 1);
+                    localStorage.setItem('bodyMeasurements', JSON.stringify(history));
+                    loadHistory();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
